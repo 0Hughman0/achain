@@ -7,7 +7,7 @@ Whilst this is supported by `asychio.Queue`, in practice it's quite unintuitive 
 `achain` sorts this out for you:
 
 ```
-import asychio
+import asyncio
 
 from achain import achain
 
@@ -39,6 +39,8 @@ With a bit of extra work, we can extend the class behind the `achain`, to make `
 This should handle things going wrong a bit better and adds the functionality that new generators can be added during iteration e.g.
 
 ```
+from achain import DynChain
+
 async def main():
     chain = DynChain(sleeper(0.4), sleeper(1))
     
@@ -68,4 +70,9 @@ surprise
 
 wrapping in the with block is a bit ugly, but does ensure things are cleaned up properly should things go wrong.
 
-	
+## Implementation Detail
+
+Something to note is that because of the way this works, unlike iterating through regular generators - where the result is generated on demand,
+technically here the next result is anychronously generated, queued, then retreived, allowing the next result to asynchronously be queued. 
+
+Hence it's kinda on demand, but always 1 step ahead!
