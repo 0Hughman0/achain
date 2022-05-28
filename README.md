@@ -45,16 +45,16 @@ async def main():
     chain = DynChain(sleeper(0.4), sleeper(1))
     
     
-	i = 0
-	async for out in chain:
-		print(out)
-		i += 1
-		
-		if i == 2:
-			async def surprise():
-				yield 'surprise'
-			
-			chain.add_generator(surprise())
+    i = 0
+    async for out in chain:
+        print(out)
+        i += 1
+
+        if i == 2:
+            async def surprise():
+                yield 'surprise'
+
+            chain.add_generator(surprise())
 
 asyncio.run(main())
 # outputs
