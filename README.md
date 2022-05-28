@@ -12,9 +12,9 @@ import asychio
 from achain import achain
 
 async def sleeper(time):
-	for i in range(3):
-		await asyncio.sleep(time)
-		yield time
+    for i in range(3):
+        await asyncio.sleep(time)
+        yield time
 
 
 async def main():
@@ -39,19 +39,22 @@ With a bit of extra work, we can extend the class behind the `achain`, to make `
 This should handle things going wrong a bit better and adds the functionality that new generators can be added during iteration e.g.
 
 ```
-chain = DynChain(sleeper(0.4), sleeper(1))
+async def main():
+    chain = DynChain(sleeper(0.4), sleeper(1))
     
     with chain:
         i = 0
         async for out in chain:
             print(out)
             i += 1
+            
             if i == 2:
                 async def surprise():
                     yield 'surprise'
                 
                 chain.add_generator(surprise())
 
+asyncio.run(main())
 # outputs
 
 0.4
