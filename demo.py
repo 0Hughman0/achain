@@ -18,17 +18,16 @@ async def demo1():
 async def demo2(): 
     chain = DynChain(sleeper(0.4), sleeper(1))
     
-    with chain:
-        i = 0
-        async for out in chain:
-            print(out)
-            i += 1
-            if i == 2:
-                async def surprise():
-                    yield 'surprise'
-                
-                chain.add_generator(surprise())  # new generators can be added during iteration!
-    
+    i = 0
+    async for out in chain:
+        print(out)
+        i += 1
+        if i == 2:
+            async def surprise():
+                yield 'surprise'
+            
+            chain.add_generator(surprise())  # new generators can be added during iteration!
+
 
 if __name__ == '__main__':
     asyncio.run(demo1())

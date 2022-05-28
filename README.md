@@ -36,7 +36,7 @@ It's not completely clear to me how safe this is if things go wrong.
 
 With a bit of extra work, we can extend the class behind the `achain`, to make `DynChain`.
 
-This should handle things going wrong a bit better and adds the functionality that new generators can be added during iteration e.g.
+This adds the functionality that new generators can be added during iteration e.g.
 
 ```
 from achain import DynChain
@@ -44,17 +44,17 @@ from achain import DynChain
 async def main():
     chain = DynChain(sleeper(0.4), sleeper(1))
     
-    with chain:
-        i = 0
-        async for out in chain:
-            print(out)
-            i += 1
-            
-            if i == 2:
-                async def surprise():
-                    yield 'surprise'
-                
-                chain.add_generator(surprise())
+    
+	i = 0
+	async for out in chain:
+		print(out)
+		i += 1
+		
+		if i == 2:
+			async def surprise():
+				yield 'surprise'
+			
+			chain.add_generator(surprise())
 
 asyncio.run(main())
 # outputs
@@ -67,8 +67,6 @@ surprise
 1
 1
 ```
-
-wrapping in the with block is a bit ugly, but does ensure things are cleaned up properly should things go wrong.
 
 ## Implementation Detail
 

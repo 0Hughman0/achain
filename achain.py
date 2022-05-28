@@ -59,7 +59,7 @@ class _AChain:
                 task.cancel()
         
         self._tasks.clear()
-
+    
     async def __aiter__(self):
         self._start()
         
@@ -68,8 +68,10 @@ class _AChain:
                 yield await asyncio.wait_for(self.q.get(), timeout=self.DEFAULT_TIMEOUT)  # prevents blocking if generator's done.
             except asyncio.TimeoutError:
                 pass
-        
-        self.cleanup()
+            except:
+                self.cleanup()
+        else:
+            self.cleanup()
         
     def __repr__(self):
         return f"<{self.__class__.__name__} running={self.running} tasks={self._tasks} at {id(self)}>"
@@ -81,20 +83,17 @@ class DynChain(_AChain):
         super().__init__(*generators)
         self.q = asyncio.Queue(maxsize)
         
-    def start(self):
+    def _start(self):
         self.running = True
+        return super()._start()
+        
+    def start(self):
         return self._start()
         
     def cleanup(self):
         self.running = False
         return super().cleanup()
         
-    def __enter__(self):
-        return self.start()
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.cleanup()
-    
     def add_generator(self, aiter):
         """
         be careful of late binding!
@@ -105,15 +104,9 @@ class DynChain(_AChain):
         
         self._create_task(self._wrap_aiter(aiter))
 
-    async def __aiter__(self):
-        if not self.running:
-            raise RuntimeError("Iteration can only begin after the queue as has been started")
+    def __aiter__(self):
+
+        return super().__aiter__()
         
-        while self._tasks or not self.q.empty():  # possible for generators to finish without emptying q!
-            try:
-                yield await asyncio.wait_for(self.q.get(), timeout=self.DEFAULT_TIMEOUT)  # prevents blocking if generator's done.
-            except asyncio.TimeoutError:
-                pass
-                
 achain = _AChain
 
